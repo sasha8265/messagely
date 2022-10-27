@@ -26,18 +26,49 @@ class User {
         return res.json(results.rows[0]);
     }
 
+    
     /** Authenticate: is this username/password valid? Returns boolean. */
 
-    static async authenticate(username, password) { }
+    static async authenticate(username, password) {
+        const results = await db.query(
+            `SELECT password 
+            FROM users
+            WHERE username = $1`,
+            [username]);
+        const user = results.rows[0];
+
+        await bcrypt.compare(password, user.password);
+        return user;
+    }
+
 
     /** Update last_login_at for user */
 
-    static async updateLoginTimestamp(username) { }
+    static async updateLoginTimestamp(username) {
+        const result = await db.query(
+            `UPDATE users
+            SET last_login_at=current_timestamp
+            WHERE username=$1
+            RETURNING username`,
+            [username]);
+        if (!result.rows[0]) {
+            throw new ExpressError(`No user found with username ${username}`, 404);
+        }
+        return result.rows[0];
+    }
+
 
     /** All: basic info on all users:
      * [{username, first_name, last_name, phone}, ...] */
 
-    static async all() { }
+    static async all() {
+        const result = await db.query(
+            `SELECT username, password, first_name, last_name, phone, join_at, last_login_at
+            FROM users`
+        );
+        return result.rows;
+    }
+    
 
     /** Get: get user by username
      *
