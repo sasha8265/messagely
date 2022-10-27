@@ -9,12 +9,11 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 /** User of the site. */
 
 class User {
-    //Why don't we need a constructor here?
+    //Why don't we use a constructor here?
 
     /** register new user -- returns
      *    {username, password, first_name, last_name, phone}
      */
-
     static async register({ username, password, first_name, last_name, phone }) {
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
@@ -38,7 +37,6 @@ class User {
         const user = results.rows[0];
 
         await bcrypt.compare(password, user.password);
-        return user;
     }
 
 
