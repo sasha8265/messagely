@@ -1,60 +1,74 @@
 /** User class for message.ly */
+const db = require("../db");
+const bcrypt = require("bcrypt");
+const ExpressError = require("../expressError");
 
+const { BCRYPT_WORK_FACTOR } = require("../config");
 
 
 /** User of the site. */
 
 class User {
+    //Why don't we need a constructor here?
 
-  /** register new user -- returns
-   *    {username, password, first_name, last_name, phone}
-   */
+    /** register new user -- returns
+     *    {username, password, first_name, last_name, phone}
+     */
 
-  static async register({username, password, first_name, last_name, phone}) { }
+    static async register({ username, password, first_name, last_name, phone }) {
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
-  /** Authenticate: is this username/password valid? Returns boolean. */
+        const results = await db.query(`
+            INSERT INTO users (username, password, first_name, last_name, phone, join_at, last_login_at)
+            VALUES ($1, $2, $3, $4, $5, current_timestamp, current_timestamp)
+            RETURNING username, password, first_name, last_name, phone`,
+            [username, hashedPassword, first_name, last_name, phone]);
+        return res.json(results.rows[0]);
+    }
 
-  static async authenticate(username, password) { }
+    /** Authenticate: is this username/password valid? Returns boolean. */
 
-  /** Update last_login_at for user */
+    static async authenticate(username, password) { }
 
-  static async updateLoginTimestamp(username) { }
+    /** Update last_login_at for user */
 
-  /** All: basic info on all users:
-   * [{username, first_name, last_name, phone}, ...] */
+    static async updateLoginTimestamp(username) { }
 
-  static async all() { }
+    /** All: basic info on all users:
+     * [{username, first_name, last_name, phone}, ...] */
 
-  /** Get: get user by username
-   *
-   * returns {username,
-   *          first_name,
-   *          last_name,
-   *          phone,
-   *          join_at,
-   *          last_login_at } */
+    static async all() { }
 
-  static async get(username) { }
+    /** Get: get user by username
+     *
+     * returns {username,
+     *          first_name,
+     *          last_name,
+     *          phone,
+     *          join_at,
+     *          last_login_at } */
 
-  /** Return messages from this user.
-   *
-   * [{id, to_user, body, sent_at, read_at}]
-   *
-   * where to_user is
-   *   {username, first_name, last_name, phone}
-   */
+    static async get(username) { }
 
-  static async messagesFrom(username) { }
+    /** Return messages from this user.
+     *
+     * [{id, to_user, body, sent_at, read_at}]
+     *
+     * where to_user is
+     *   {username, first_name, last_name, phone}
+     */
 
-  /** Return messages to this user.
-   *
-   * [{id, from_user, body, sent_at, read_at}]
-   *
-   * where from_user is
-   *   {username, first_name, last_name, phone}
-   */
+    static async messagesFrom(username) { }
 
-  static async messagesTo(username) { }
+    /** Return messages to this user.
+     *
+     * [{id, from_user, body, sent_at, read_at}]
+     *
+     * where from_user is
+     *   {username, first_name, last_name, phone}
+     */
+
+    static async messagesTo(username) { }
 }
 
 
