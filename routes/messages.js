@@ -1,9 +1,9 @@
 const Router = require("express").Router;
-const router = new Router()
 const ExpressError = require("../expressError");
-const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../config");
+const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth");
 const Message = require("../models/message");
+const router = new Router()
+
 
 /** GET /:id - get detail of message.
  *
@@ -17,6 +17,19 @@ const Message = require("../models/message");
  * Make sure that the currently-logged-in users is either the to or from user.
  *
  **/
+router.get('/:id', ensureCorrectUser, async (req, res, next) => {
+    try {
+        const username = req.user.username;
+        const message = await Message.get(req.params.id);
+
+        if (message.to_user_username !== username || message.from_user.username !== username) {
+            throw new ExpressError("You are not authorized to read this message", 401)
+        }
+        return res.json({message: message})
+    } catch (e) {
+        return next (e)
+    }
+})
 
 
 /** POST / - post message.
