@@ -58,6 +58,21 @@ router.post('/', ensureLoggedIn, async (req, res, next) => {
  * Make sure that the only the intended recipient can mark as read.
  *
  **/
+router.post('/:id/read', ensureLoggedIn, async (req, res, next) => {
+    try {
+        const username = req.user.username;
+        const message = await Message.get(req.params.id);
+
+        if (message.to_username !== username) {
+            throw new ExpressError("Not authorized to read that message", 401);
+        }
+        let readMsg = await Message.markRead(req.params.id);
+        return res.json({ readMsg });
+
+    } catch (e) {
+        return next(e);
+    }
+});
 
 module.exports = router;
 
