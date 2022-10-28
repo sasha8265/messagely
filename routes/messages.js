@@ -38,7 +38,18 @@ router.get('/:id', ensureCorrectUser, async (req, res, next) => {
  *   {message: {id, from_username, to_username, body, sent_at}}
  *
  **/
-
+router.post('/', ensureLoggedIn, async (req, res, next) => {
+    try {
+        const message = await Message.create({
+            from_username: req.user.username,
+            to_username: req.body.to_username,
+            body: req.body.body
+        });
+        return res.json({message: message})
+    } catch (e) {
+        return next (e)
+    }
+});
 
 /** POST/:id/read - mark message as read:
  *
