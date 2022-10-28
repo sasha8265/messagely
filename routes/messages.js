@@ -22,7 +22,7 @@ router.get('/:id', ensureCorrectUser, async (req, res, next) => {
         const username = req.user.username;
         const message = await Message.get(req.params.id);
 
-        if (message.to_user_username !== username || message.from_user.username !== username) {
+        if (message.to_user_username !== username && message.from_user.username !== username) {
             throw new ExpressError("You are not authorized to read this message", 401)
         }
         return res.json({message: message})
