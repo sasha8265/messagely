@@ -1,3 +1,10 @@
+const Router = require("express").Router;
+const router = new Router()
+const ExpressError = require("../expressError");
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
+const Message = require("../models/message");
+
 /** GET /:id - get detail of message.
  *
  * => {message: {id,
@@ -27,4 +34,6 @@
  * Make sure that the only the intended recipient can mark as read.
  *
  **/
+
+module.exports = router;
 

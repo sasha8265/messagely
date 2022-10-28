@@ -1,12 +1,8 @@
-const express = require("express");
-const router = new express.Router();
-const ExpressError = require("../expressError");
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { BCRYPT_WORK_FACTOR, SECRET_KEY } = require("../config");
-const { ensureLoggedIn, ensureAdmin, ensureCorrectUser } = require("../middleware/auth");
+const Router = require("express").Router;
+const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth");
 const User = require("../models/user");
+const router = new Router()
+
 
 /** GET / - get list of users.
  *
